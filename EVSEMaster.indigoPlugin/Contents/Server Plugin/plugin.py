@@ -22,17 +22,63 @@ except Exception:
     PlugStateEnum = None
     CurrentStateEnum = None
 
+import logging
+import os
+import sys
+import platform
+import traceback
+import logging
+import logging.handlers
+from os import path
+from datetime import datetime, timedelta
+from typing import Dict, List, Optional, Tuple, Set
 
 STATUS_INTERVAL_SEC = 60
 LOGIN_RETRY_MIN = 30
 EVENT_GRACE_SEC = 90
 RECONNECT_BACKOFF_MAX = 30.0
 
+class IndigoLogHandler(logging.Handler):
+    def __init__(self, display_name, level=logging.NOTSET):
+        super().__init__(level)
+        self.displayName = display_name
+
+    def emit(self, record):
+        """not used by this class; must be called independently by indigo"""
+        logmessage = ""
+        is_error = False
+        levelno = getattr(record, "levelno", logging.INFO)
+        try:
+            if self.level <= levelno:
+                is_exception = record.exc_info is not None
+                if levelno == 5 or levelno == logging.DEBUG:
+                    logmessage = "({}:{}:{}): {}".format(path.basename(record.pathname), record.funcName, record.lineno, record.getMessage())
+                elif levelno == logging.INFO:
+                    logmessage = record.getMessage()
+                elif levelno == logging.WARNING:
+                    logmessage = record.getMessage()
+                elif levelno == logging.ERROR:
+                    logmessage = "({}: Function: {}  line: {}):    Error :  Message : {}".format(path.basename(record.pathname), record.funcName, record.lineno, record.getMessage())
+                    is_error = True
+
+                if is_exception:
+                    logmessage = "({}: Function: {}  line: {}):    Exception :  Message : {}".format(path.basename(record.pathname), record.funcName, record.lineno, record.getMessage())
+                    indigo.server.log(message=logmessage, type=self.displayName, isError=is_error, level=levelno)
+                    etype, value, tb = record.exc_info
+                    tb_string = "".join(traceback.format_tb(tb))
+                    indigo.server.log(f"Traceback:\n{tb_string}", type=self.displayName, isError=is_error, level=levelno)
+                    indigo.server.log(f"Error in plugin execution:\n\n{traceback.format_exc(30)}", type=self.displayName, isError=is_error, level=levelno)
+                    indigo.server.log(f"\nExc_info: {record.exc_info} \nExc_Text: {record.exc_text} \nStack_info: {record.stack_info}", type=self.displayName, isError=is_error, level=levelno)
+                    return
+
+                indigo.server.log(message=logmessage, type=self.displayName, isError=is_error, level=levelno)
+        except Exception as ex:
+            indigo.server.log(f"Error in Logging: {ex}", type=self.displayName, isError=True, level=logging.ERROR)
 
 class Plugin(indigo.PluginBase):
     def __init__(self, plugin_id, plugin_display_name, plugin_version, plugin_prefs):
         super().__init__(plugin_id, plugin_display_name, plugin_version, plugin_prefs)
-        self.debug = True
+        #self.debug = True
 
         self._event_loop = None
         self._async_thread = None
@@ -45,6 +91,63 @@ class Plugin(indigo.PluginBase):
         self._authed_flag = {}
         self._last_event_at = {}
         self._last_login_attempt_at = {}
+
+        if hasattr(self, "indigo_log_handler") and self.indigo_log_handler:
+            self.logger.removeHandler(self.indigo_log_handler)
+
+
+        # Base logger level (collect everything; handlers filter)
+        self.logger.setLevel(logging.DEBUG)
+
+        # Read prefs (with safe defaults)
+        try:
+            self.logLevel = int(self.pluginPrefs.get("showDebugLevel", logging.INFO))
+            self.fileloglevel = int(self.pluginPrefs.get("showDebugFileLevel", logging.DEBUG))
+        except Exception:
+            self.logLevel = logging.INFO
+            self.fileloglevel = logging.DEBUG
+
+        # Indigo Event Log handler - remove existing before adding (do NOT set to None)
+        try:
+            if self.indigo_log_handler:
+                self.logger.removeHandler(self.indigo_log_handler)
+            self.indigo_log_handler = IndigoLogHandler(plugin_display_name, self.logLevel)
+            self.indigo_log_handler.setLevel(self.logLevel)
+            self.indigo_log_handler.setFormatter(logging.Formatter("%(message)s"))
+            self.logger.addHandler(self.indigo_log_handler)
+        except Exception as exc:
+            indigo.server.log(f"Failed to create IndigoLogHandler: {exc}", isError=True)
+
+        # File handler (Logs/Plugins/<bundle-id>.log)
+        try:
+            logs_dir = path.join(indigo.server.getInstallFolderPath(), "Logs", "Plugins")
+            os.makedirs(logs_dir, exist_ok=True)
+            logfile = path.join(logs_dir, f"{plugin_id}.log")
+            self.plugin_file_handler = logging.handlers.RotatingFileHandler(logfile, maxBytes=2_000_000, backupCount=3)
+            pfmt = logging.Formatter(
+                "%(asctime)s.%(msecs)03d\t[%(levelname)8s] %(name)20s.%(funcName)-25s%(message)s",
+                datefmt="%Y-%m-%d %H:%M:%S",
+            )
+            self.plugin_file_handler.setFormatter(pfmt)
+            self.plugin_file_handler.setLevel(self.fileloglevel)
+            self.logger.addHandler(self.plugin_file_handler)
+        except Exception as exc:
+            self.logger.exception(exc)
+
+        # Convenience debug flag
+        #self.debug = bool(self.pluginPrefs.get("showDebugInfo", False))
+
+        # Session header
+        self.logger.info("")
+        self.logger.info("{0:=^120}".format(" Initializing EVSE Master "))
+        self.logger.info(f"{'Plugin name:':<28} {plugin_display_name}")
+        self.logger.info(f"{'Plugin version:':<28} {plugin_version}")
+        self.logger.info(f"{'Plugin ID:':<28} {plugin_id}")
+        self.logger.info(f"{'Indigo version:':<28} {indigo.server.version}")
+        self.logger.info(f"{'Silicon version:':<28} {platform.machine()}")
+        self.logger.info(f"{'Python version:':<28} {sys.version.replace(os.linesep, ' ')}")
+        self.logger.info(f"{'Python Directory:':<28} {sys.prefix.replace(os.linesep, ' ')}")
+        self.logger.info("{0:=^120}".format(" End Initializing "))
 
     # ========= Indigo lifecycle / thread bootstrap =========
     def startup(self):
@@ -316,6 +419,46 @@ class Plugin(indigo.PluginBase):
 
             await asyncio.sleep(backoff)
             backoff = min(backoff * 2.0, RECONNECT_BACKOFF_MAX)
+
+    def closedPrefsConfigUi(self, values_dict: indigo.Dict, user_cancelled: bool) -> None:
+
+        self.logger.debug(f"closedPluginConfigUi called with values_dict: {values_dict} and user_cancelled: {user_cancelled}")
+        if user_cancelled:
+            return
+        # Persist and apply log settings
+        try:
+            self.pluginPrefs["showDebugInfo"] = bool(values_dict.get("showDebugInfo", False))
+            self.pluginPrefs["showDebugLevel"] = int(values_dict.get("showDebugLevel", logging.INFO))
+            self.pluginPrefs["showDebugFileLevel"] = int(values_dict.get("showDebugFileLevel", logging.DEBUG))
+            indigo.server.savePluginPrefs()
+
+            #self.debug = bool(values_dict.get("showDebugInfo", False))
+            self.logLevel = int(values_dict.get("showDebugLevel", logging.INFO))
+            self.fileloglevel = int(values_dict.get("showDebugFileLevel", logging.DEBUG))
+
+            self.logLevel = int(values_dict.get("showDebugLevel", '5'))
+            self.fileloglevel = int(values_dict.get("showDebugFileLevel", '5'))
+            self.debug1 = values_dict.get('debug1', False)
+            self.debug2 = values_dict.get('debug2', False)
+            self.debug3 = values_dict.get('debug3', False)
+            self.debug4 = values_dict.get('debug4', False)
+            self.debug5 = values_dict.get('debug5', False)
+            self.debug6 = values_dict.get('debug6', False)
+            self.debug7 = values_dict.get('debug7', False)
+            self.debug8 = values_dict.get('debug8', False)
+            self.debug9 = values_dict.get('debug9', False)
+
+            self.indigo_log_handler.setLevel(self.logLevel)
+            self.plugin_file_handler.setLevel(self.fileloglevel)
+
+            self.logger.debug(u"logLevel = " + str(self.logLevel))
+            self.logger.debug(u"User prefs saved.")
+            self.logger.debug(u"Debugging on (Level: {0})".format(self.logLevel))
+
+
+            self.logger.debug(f"Applied logging prefs: EventLog={logging.getLevelName(self.logLevel)}, File={logging.getLevelName(self.fileloglevel)}")
+        except Exception as exc:
+            self.logger.exception(exc)
 
     async def _attempt_login(self, dev_id: int, proto: SimpleEVSEProtocol, why: str):
         dev = indigo.devices.get(dev_id)
