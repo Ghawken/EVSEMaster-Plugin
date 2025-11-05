@@ -1,0 +1,354 @@
+<?xml version="1.0"?>
+<Devices>
+    <Device type="relay" id="evseCharger">
+        <Name>EVSE Charger</Name>
+        <ConfigUI>
+            <Field id="host" type="textfield">
+                <Label>EVSE IP Address or Hostname:</Label>
+            </Field>
+            <Field id="password" type="textfield">
+                <Label>EVSE PIN (6 digits):</Label>
+            </Field>
+        </ConfigUI>
+        <States>
+            <!-- Connection and convenience -->
+            <State id="connected">
+                <ValueType>Boolean</ValueType>
+                <TriggerLabel>Connected (Transport)</TriggerLabel>
+                <ControlPageLabel>Connected</ControlPageLabel>
+            </State>
+            <State id="auth_ok">
+                <ValueType>Boolean</ValueType>
+                <TriggerLabel>Authenticated</TriggerLabel>
+                <ControlPageLabel>Authenticated</ControlPageLabel>
+            </State>
+            <State id="status_text">
+                <ValueType>String</ValueType>
+                <TriggerLabel>Status Text</TriggerLabel>
+                <ControlPageLabel>Status</ControlPageLabel>
+            </State>
+            <State id="state_summary">
+                <ValueType>String</ValueType>
+                <TriggerLabel>EVSE State (Summary)</TriggerLabel>
+                <ControlPageLabel>EVSE State</ControlPageLabel>
+            </State>
+            <State id="last_update">
+                <ValueType>String</ValueType>
+                <TriggerLabel>Last Update</TriggerLabel>
+                <ControlPageLabel>Last Update</ControlPageLabel>
+            </State>
+            <State id="last_error">
+                <ValueType>String</ValueType>
+                <TriggerLabel>Last Error</TriggerLabel>
+                <ControlPageLabel>Last Error</ControlPageLabel>
+            </State>
+            <State id="vehicle_connected">
+                <ValueType>Boolean</ValueType>
+                <TriggerLabel>Vehicle Connected</TriggerLabel>
+                <ControlPageLabel>Vehicle Connected</ControlPageLabel>
+            </State>
+            <State id="charging">
+                <ValueType>Boolean</ValueType>
+                <TriggerLabel>Charging</TriggerLabel>
+                <ControlPageLabel>Charging</ControlPageLabel>
+            </State>
+
+            <!-- Device Info (EvseDeviceInfo) -->
+            <State id="di_type">
+                <ValueType>Integer</ValueType>
+                <TriggerLabel>Device Type</TriggerLabel>
+                <ControlPageLabel>Type</ControlPageLabel>
+            </State>
+            <State id="di_brand">
+                <ValueType>String</ValueType>
+                <TriggerLabel>Brand</TriggerLabel>
+                <ControlPageLabel>Brand</ControlPageLabel>
+            </State>
+            <State id="di_model">
+                <ValueType>String</ValueType>
+                <TriggerLabel>Model</TriggerLabel>
+                <ControlPageLabel>Model</ControlPageLabel>
+            </State>
+            <State id="di_hardware_version">
+                <ValueType>String</ValueType>
+                <TriggerLabel>Hardware Version</TriggerLabel>
+                <ControlPageLabel>HW Version</ControlPageLabel>
+            </State>
+            <State id="di_max_power_w">
+                <ValueType>Integer</ValueType>
+                <TriggerLabel>Max Power (W)</TriggerLabel>
+                <ControlPageLabel>Max Power (W)</ControlPageLabel>
+            </State>
+            <State id="di_max_power_kw">
+                <ValueType>Number</ValueType>
+                <TriggerLabel>Max Power (kW)</TriggerLabel>
+                <ControlPageLabel>Max Power (kW)</ControlPageLabel>
+            </State>
+            <State id="di_max_amps">
+                <ValueType>Integer</ValueType>
+                <TriggerLabel>Max Amps</TriggerLabel>
+                <ControlPageLabel>Max Amps</ControlPageLabel>
+            </State>
+            <State id="di_serial_number">
+                <ValueType>String</ValueType>
+                <TriggerLabel>Serial Number</TriggerLabel>
+                <ControlPageLabel>Serial</ControlPageLabel>
+            </State>
+            <State id="di_nickname">
+                <ValueType>String</ValueType>
+                <TriggerLabel>Nickname</TriggerLabel>
+                <ControlPageLabel>Nickname</ControlPageLabel>
+            </State>
+            <State id="di_configured_max_amps">
+                <ValueType>Integer</ValueType>
+                <TriggerLabel>Configured Max Amps</TriggerLabel>
+                <ControlPageLabel>Configured Max Amps</ControlPageLabel>
+            </State>
+
+            <!-- Status (EvseStatus) -->
+            <State id="st_line_id">
+                <ValueType>Integer</ValueType>
+                <TriggerLabel>Line ID</TriggerLabel>
+                <ControlPageLabel>Line ID</ControlPageLabel>
+            </State>
+            <State id="st_inner_temp_c">
+                <ValueType>Number</ValueType>
+                <TriggerLabel>Inner Temperature (°C)</TriggerLabel>
+                <ControlPageLabel>Inner Temp (°C)</ControlPageLabel>
+            </State>
+            <State id="st_outer_temp_c">
+                <ValueType>Number</ValueType>
+                <TriggerLabel>Outer Temperature (°C)</TriggerLabel>
+                <ControlPageLabel>Outer Temp (°C)</ControlPageLabel>
+            </State>
+            <State id="st_emergency_stop">
+                <ValueType>Boolean</ValueType>
+                <TriggerLabel>Emergency Stop Active</TriggerLabel>
+                <ControlPageLabel>Emergency Stop</ControlPageLabel>
+            </State>
+            <State id="safety_status">
+                <ValueType>String</ValueType>
+                <TriggerLabel>Safety Status</TriggerLabel>
+                <ControlPageLabel>Safety</ControlPageLabel>
+            </State>
+            <State id="st_plug_state">
+                <ValueType>Integer</ValueType>
+                <TriggerLabel>Plug State</TriggerLabel>
+                <ControlPageLabel>Plug State</ControlPageLabel>
+            </State>
+            <State id="st_plug_state_name">
+                <ValueType>String</ValueType>
+                <TriggerLabel>Plug State (Name)</TriggerLabel>
+                <ControlPageLabel>Plug State</ControlPageLabel>
+            </State>
+            <State id="st_output_state">
+                <ValueType>Integer</ValueType>
+                <TriggerLabel>Output State</TriggerLabel>
+                <ControlPageLabel>Output State</ControlPageLabel>
+            </State>
+            <State id="st_output_state_name">
+                <ValueType>String</ValueType>
+                <TriggerLabel>Output State (Name)</TriggerLabel>
+                <ControlPageLabel>Output</ControlPageLabel>
+            </State>
+            <State id="st_current_state">
+                <ValueType>Integer</ValueType>
+                <TriggerLabel>Current State</TriggerLabel>
+                <ControlPageLabel>Current State</ControlPageLabel>
+            </State>
+            <State id="st_current_state_name">
+                <ValueType>String</ValueType>
+                <TriggerLabel>Current State (Name)</TriggerLabel>
+                <ControlPageLabel>Current State</ControlPageLabel>
+            </State>
+            <State id="st_errors">
+                <ValueType>Integer</ValueType>
+                <TriggerLabel>Error Bits</TriggerLabel>
+                <ControlPageLabel>Errors</ControlPageLabel>
+            </State>
+            <State id="st_l1_voltage_v">
+                <ValueType>Number</ValueType>
+                <TriggerLabel>L1 Voltage (V)</TriggerLabel>
+                <ControlPageLabel>L1 Voltage (V)</ControlPageLabel>
+            </State>
+            <State id="st_l1_amps_a">
+                <ValueType>Number</ValueType>
+                <TriggerLabel>L1 Current (A)</TriggerLabel>
+                <ControlPageLabel>L1 Current (A)</ControlPageLabel>
+            </State>
+            <State id="st_l2_voltage_v">
+                <ValueType>Number</ValueType>
+                <TriggerLabel>L2 Voltage (V)</TriggerLabel>
+                <ControlPageLabel>L2 Voltage (V)</ControlPageLabel>
+            </State>
+            <State id="st_l2_amps_a">
+                <ValueType>Number</ValueType>
+                <TriggerLabel>L2 Current (A)</TriggerLabel>
+                <ControlPageLabel>L2 Current (A)</ControlPageLabel>
+            </State>
+            <State id="st_l3_voltage_v">
+                <ValueType>Number</ValueType>
+                <TriggerLabel>L3 Voltage (V)</TriggerLabel>
+                <ControlPageLabel>L3 Voltage (V)</ControlPageLabel>
+            </State>
+            <State id="st_l3_amps_a">
+                <ValueType>Number</ValueType>
+                <TriggerLabel>L3 Current (A)</TriggerLabel>
+                <ControlPageLabel>L3 Current (A)</ControlPageLabel>
+            </State>
+            <State id="phase_summary">
+                <ValueType>String</ValueType>
+                <TriggerLabel>Phase Summary</TriggerLabel>
+                <ControlPageLabel>Phase Summary</ControlPageLabel>
+            </State>
+            <State id="st_current_power_w">
+                <ValueType>Integer</ValueType>
+                <TriggerLabel>Power (W)</TriggerLabel>
+                <ControlPageLabel>Power (W)</ControlPageLabel>
+            </State>
+            <State id="st_current_power_kw">
+                <ValueType>Number</ValueType>
+                <TriggerLabel>Power (kW)</TriggerLabel>
+                <ControlPageLabel>Power (kW)</ControlPageLabel>
+            </State>
+            <State id="st_total_kwh">
+                <ValueType>Number</ValueType>
+                <TriggerLabel>Total Energy (kWh)</TriggerLabel>
+                <ControlPageLabel>Total Energy (kWh)</ControlPageLabel>
+            </State>
+
+            <!-- Charging Status (ChargingStatus) -->
+            <State id="ch_line_id">
+                <ValueType>Integer</ValueType>
+                <TriggerLabel>Charge Line ID</TriggerLabel>
+                <ControlPageLabel>Charge Line ID</ControlPageLabel>
+            </State>
+            <State id="ch_current_state">
+                <ValueType>Integer</ValueType>
+                <TriggerLabel>Charge State</TriggerLabel>
+                <ControlPageLabel>Charge State</ControlPageLabel>
+            </State>
+            <State id="ch_current_state_name">
+                <ValueType>String</ValueType>
+                <TriggerLabel>Charge State (Name)</TriggerLabel>
+                <ControlPageLabel>Charge State</ControlPageLabel>
+            </State>
+            <State id="ch_charge_id">
+                <ValueType>String</ValueType>
+                <TriggerLabel>Charge ID</TriggerLabel>
+                <ControlPageLabel>Charge ID</ControlPageLabel>
+            </State>
+            <State id="ch_start_type">
+                <ValueType>Integer</ValueType>
+                <TriggerLabel>Start Type</TriggerLabel>
+                <ControlPageLabel>Start Type</ControlPageLabel>
+            </State>
+            <State id="ch_start_type_name">
+                <ValueType>String</ValueType>
+                <TriggerLabel>Start Type (Name)</TriggerLabel>
+                <ControlPageLabel>Start Type</ControlPageLabel>
+            </State>
+            <State id="ch_charge_type">
+                <ValueType>Integer</ValueType>
+                <TriggerLabel>Charge Type</TriggerLabel>
+                <ControlPageLabel>Charge Type</ControlPageLabel>
+            </State>
+            <State id="ch_charge_type_name">
+                <ValueType>String</ValueType>
+                <TriggerLabel>Charge Type (Name)</TriggerLabel>
+                <ControlPageLabel>Charge Type</ControlPageLabel>
+            </State>
+            <State id="ch_max_duration_min">
+                <ValueType>Integer</ValueType>
+                <TriggerLabel>Max Duration (min)</TriggerLabel>
+                <ControlPageLabel>Max Duration (min)</ControlPageLabel>
+            </State>
+            <State id="ch_max_energy_kwh">
+                <ValueType>Number</ValueType>
+                <TriggerLabel>Max Energy (kWh)</TriggerLabel>
+                <ControlPageLabel>Max Energy (kWh)</ControlPageLabel>
+            </State>
+            <State id="ch_charge_param3">
+                <ValueType>Number</ValueType>
+                <TriggerLabel>Charge Param3</TriggerLabel>
+                <ControlPageLabel>Charge Param3</ControlPageLabel>
+            </State>
+            <State id="ch_reservation_datetime">
+                <ValueType>String</ValueType>
+                <TriggerLabel>Reservation Time (raw)</TriggerLabel>
+                <ControlPageLabel>Reservation Time (raw)</ControlPageLabel>
+            </State>
+            <State id="ch_reservation_time">
+                <ValueType>String</ValueType>
+                <TriggerLabel>Reservation Time</TriggerLabel>
+                <ControlPageLabel>Reservation Time</ControlPageLabel>
+            </State>
+            <State id="ch_user_id">
+                <ValueType>String</ValueType>
+                <TriggerLabel>User ID</TriggerLabel>
+                <ControlPageLabel>User ID</ControlPageLabel>
+            </State>
+            <State id="ch_max_electricity_a">
+                <ValueType>Integer</ValueType>
+                <TriggerLabel>Max Current (A)</TriggerLabel>
+                <ControlPageLabel>Max Current (A)</ControlPageLabel>
+            </State>
+            <State id="ch_set_datetime">
+                <ValueType>String</ValueType>
+                <TriggerLabel>Set Time</TriggerLabel>
+                <ControlPageLabel>Set Time</ControlPageLabel>
+            </State>
+            <State id="ch_duration_seconds">
+                <ValueType>Integer</ValueType>
+                <TriggerLabel>Duration (sec)</TriggerLabel>
+                <ControlPageLabel>Duration (sec)</ControlPageLabel>
+            </State>
+            <State id="ch_session_duration">
+                <ValueType>String</ValueType>
+                <TriggerLabel>Session Duration</TriggerLabel>
+                <ControlPageLabel>Session Duration</ControlPageLabel>
+            </State>
+            <State id="ch_start_kwh_counter">
+                <ValueType>Number</ValueType>
+                <TriggerLabel>Start kWh</TriggerLabel>
+                <ControlPageLabel>Start kWh</ControlPageLabel>
+            </State>
+            <State id="ch_current_kwh_counter">
+                <ValueType>Number</ValueType>
+                <TriggerLabel>Current kWh</TriggerLabel>
+                <ControlPageLabel>Current kWh</ControlPageLabel>
+            </State>
+            <State id="ch_charge_kwh">
+                <ValueType>Number</ValueType>
+                <TriggerLabel>Session kWh</TriggerLabel>
+                <ControlPageLabel>Session kWh</ControlPageLabel>
+            </State>
+            <State id="ch_charge_price">
+                <ValueType>Number</ValueType>
+                <TriggerLabel>Charge Price</TriggerLabel>
+                <ControlPageLabel>Charge Price</ControlPageLabel>
+            </State>
+            <State id="ch_fee_type">
+                <ValueType>Integer</ValueType>
+                <TriggerLabel>Fee Type</TriggerLabel>
+                <ControlPageLabel>Fee Type</ControlPageLabel>
+            </State>
+            <State id="ch_fee_type_name">
+                <ValueType>String</ValueType>
+                <TriggerLabel>Fee Type (Name)</TriggerLabel>
+                <ControlPageLabel>Fee Type</ControlPageLabel>
+            </State>
+            <State id="ch_charge_fee">
+                <ValueType>Number</ValueType>
+                <TriggerLabel>Charge Fee</TriggerLabel>
+                <ControlPageLabel>Charge Fee</ControlPageLabel>
+            </State>
+            <State id="ch_charge_limits">
+                <ValueType>String</ValueType>
+                <TriggerLabel>Charge Limits</TriggerLabel>
+                <ControlPageLabel>Charge Limits</ControlPageLabel>
+            </State>
+        </States>
+        <UiDisplayStateId>status_text</UiDisplayStateId>
+    </Device>
+</Devices>

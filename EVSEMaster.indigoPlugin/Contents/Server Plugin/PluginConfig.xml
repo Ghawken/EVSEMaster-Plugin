@@ -1,0 +1,47 @@
+<?xml version="1.0"?>
+<PluginConfig>
+    <SupportURL>https://wiki.indigodomo.com/</SupportURL>
+    <Field id="infoLabel0" type="label" fontSize='large' fontColor="blue">
+        <Field id="sep7c" type="separator"/>
+
+        <Label>EVSEMaster Indigo Plugin</Label>
+    </Field>
+    <Field id="space0" type="label" fontColor="black">
+        <Label>Developed by: GlennNZ</Label>
+    </Field>
+        <Field id="sepa37" type="separator"/>
+   <Field id="infoLabel01" type="label" fontSize='large' fontColor="blue">
+        <Label>EVSE Master Charger Control
+        </Label>
+    </Field>
+           <Field id="sep_hint_3" type="separator"/>
+
+    <Field id="showDebugInfo" type="checkbox" defaultValue="false">
+        <Label>Enable debug logging</Label>
+    </Field>
+
+    <Field id="showDebugLevel" type="menu" defaultValue="20" tooltip="Controls the amount of debug information written to the log.">
+        <Label>Indigo Log Debug level:</Label>
+        <Description>Level of Debug information to show in Indigo</Description>
+        <List>
+            <Option value="5">Detailed Debugging Messages</Option>
+            <Option value="10">Debugging Messages</Option>
+            <Option value="20">Informational Messages</Option>
+            <Option value="30">Warning Messages</Option>
+            <Option value="40">Error Messages</Option>
+            <Option value="50">Critical Errors Only</Option>
+        </List>
+    </Field>
+        <Field id="showDebugFileLevel" type="menu" defaultValue="5" tooltip="Controls the amount of debug information written to the log.">
+        <Label>File Debug level:</Label>
+        <Description>Level of Debug information saved to File</Description>
+        <List>
+            <Option value="5">Detailed Debugging Messages</Option>
+            <Option value="10">Debugging Messages</Option>
+            <Option value="20">Informational Messages</Option>
+            <Option value="30">Warning Messages</Option>
+            <Option value="40">Error Messages</Option>
+            <Option value="50">Critical Errors Only</Option>
+        </List>
+    </Field>
+</PluginConfig>

@@ -1,0 +1,22 @@
+<?xml version="1.0"?>
+<Actions>
+    <Action id="startCharging" deviceFilter="self">
+        <Name>Start Charging</Name>
+        <CallbackMethod>start_charging_action</CallbackMethod>
+    </Action>
+
+    <Action id="stopCharging" deviceFilter="self">
+        <Name>Stop Charging</Name>
+        <CallbackMethod>stop_charging_action</CallbackMethod>
+    </Action>
+
+    <Action id="setOutputAmperage" deviceFilter="self">
+        <Name>Set Output Amperage</Name>
+        <CallbackMethod>set_output_amps_action</CallbackMethod>
+        <ConfigUI>
+            <Field id="amps" type="textfield" defaultValue="16">
+                <Label>Amperage (6–32 A):</Label>
+            </Field>
+        </ConfigUI>
+    </Action>
+</Actions>
