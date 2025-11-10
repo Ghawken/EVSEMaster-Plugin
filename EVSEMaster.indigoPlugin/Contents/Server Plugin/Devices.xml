@@ -231,7 +231,7 @@
             <State id="ch_current_state_name">
                 <ValueType>String</ValueType>
                 <TriggerLabel>Charge State (Name)</TriggerLabel>
-                <ControlPageLabel>Charge State</ControlPageLabel>
+                <ControlPageLabel>Charge State (Name)</ControlPageLabel>
             </State>
             <State id="ch_charge_id">
                 <ValueType>String</ValueType>

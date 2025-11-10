@@ -33,6 +33,7 @@ from os import path
 from datetime import datetime, timedelta
 from typing import Dict, List, Optional, Tuple, Set
 
+
 STATUS_INTERVAL_SEC = 60
 LOGIN_RETRY_MIN = 30
 EVENT_GRACE_SEC = 90
@@ -92,6 +93,9 @@ class Plugin(indigo.PluginBase):
         self._last_event_at = {}
         self._last_login_attempt_at = {}
 
+        ## Stream
+
+
         if hasattr(self, "indigo_log_handler") and self.indigo_log_handler:
             self.logger.removeHandler(self.indigo_log_handler)
 
@@ -118,25 +122,32 @@ class Plugin(indigo.PluginBase):
         except Exception as exc:
             indigo.server.log(f"Failed to create IndigoLogHandler: {exc}", isError=True)
 
-        # File handler (Logs/Plugins/<bundle-id>.log)
         try:
-            logs_dir = path.join(indigo.server.getInstallFolderPath(), "Logs", "Plugins")
-            os.makedirs(logs_dir, exist_ok=True)
-            logfile = path.join(logs_dir, f"{plugin_id}.log")
-            self.plugin_file_handler = logging.handlers.RotatingFileHandler(logfile, maxBytes=2_000_000, backupCount=3)
-            pfmt = logging.Formatter(
-                "%(asctime)s.%(msecs)03d\t[%(levelname)8s] %(name)20s.%(funcName)-25s%(message)s",
-                datefmt="%Y-%m-%d %H:%M:%S",
-            )
-            self.plugin_file_handler.setFormatter(pfmt)
             self.plugin_file_handler.setLevel(self.fileloglevel)
-            self.logger.addHandler(self.plugin_file_handler)
         except Exception as exc:
             self.logger.exception(exc)
+        try:
+            # 1. Root logger: make sure we can capture everything to file.
+            root_logger = logging.getLogger()
+            if self.plugin_file_handler not in root_logger.handlers:
+                root_logger.addHandler(self.plugin_file_handler)
+            # Keep root permissive so child DEBUG flows (guide: handlers filter)
+            if root_logger.level > logging.DEBUG:
+                root_logger.setLevel(logging.DEBUG)
 
-        # Convenience debug flag
-        #self.debug = bool(self.pluginPrefs.get("showDebugInfo", False))
+            pm = logging.getLogger("evsemaster")
+            pm.handlers[:] = []          # strip any handlers library may have added
+            pm.setLevel(logging.NOTSET)  # inherit from root (DEBUG)
+            pm.propagate = True          # bubble up to root (file handler) AND to any parent chain
 
+            # 4. Emit a test line (will appear once) so you can confirm in file quickly.
+            pm.debug("[LOGTEST] evsemaster logger attached (propagate=TRUE -> root)")
+
+            self.logger.debug("Library logging hooked (root captures evsemaster)")
+        except Exception as exc:
+            self.logger.debug(f"Library logging attach failed: {exc}")
+
+        logging.getLogger("evsemaster").addHandler(self.plugin_file_handler)
         # Session header
         self.logger.info("")
         self.logger.info("{0:=^120}".format(" Initializing EVSE Master "))
